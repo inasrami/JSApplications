@@ -1,7 +1,7 @@
-import { html } from '/node_modules/lit-html/lit-html.js';
+import { html } from '../lib.js';
 import { searchCars } from '../api/data.js';
 
-const searchTemplate = (cars, onSearch, params = '') => html`
+const searchTemplate = (cars, onSearch) => html`
     <section id="search">
         <div class="form">
             <h4>Search</h4>
@@ -11,31 +11,35 @@ const searchTemplate = (cars, onSearch, params = '') => html`
             </form>
         </div>
         <div class="search-result">
-            ${cars.length == 0 
-                ? html`<h2 class="no-avaliable">No result.</h2>`
-                : cars.map(car => html`
-                    <div class="car">
-                        <img src=${car.imageUrl} alt="example1"/>
-                        <h3 class="model">${car.model}</h3>
-                        <a class="details-btn" href="/details/${car._id}">More Info</a>
-                    </div>`)
+            ${cars.length > 0 
+                ? cars.map(carCard)
+                : html`<h2 class="no-avaliable">No result.</h2>`
             }
         </div>
-    </section>`;
+    </section>
+`;
 
-export async function searchPage(ctx) {
+const carCard = (car) => html`
+    <div class="car">
+        <img src="${car.imageUrl}" alt="example1"/>
+        <h3 class="model">${car.model}</h3>
+        <a class="details-btn" href="/details/${car._id}">More Info</a>
+    </div>
+`;
+
+export function showSearch(ctx) {
     ctx.render(searchTemplate([], onSearch));
 
     async function onSearch(event) {
         event.preventDefault();
         const formData = new FormData(event.target);
-        const search = formData.get('search').trim();
+        const query = formData.get('search').trim();
 
-        if (search == '') {
+        if (query == '') {
             return alert('Please enter a search query');
         }
 
-        const cars = await searchCars(search);
-        ctx.render(searchTemplate(cars, onSearch, search));
+        const cars = await searchCars(query);
+        ctx.render(searchTemplate(cars, onSearch));
     }
 }

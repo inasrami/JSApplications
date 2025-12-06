@@ -40,7 +40,7 @@ async function request(method, url, data) {
     }
 }
 
-export const get = request.bind(null, 'get');
-export const post = request.bind(null, 'post');
-export const put = request.bind(null, 'put');
-export const del = request.bind(null, 'delete');
+export const get = request.bind(null, 'GET');
+export const post = request.bind(null, 'POST');
+export const put = request.bind(null, 'PUT');
+export const del = request.bind(null, 'DELETE');

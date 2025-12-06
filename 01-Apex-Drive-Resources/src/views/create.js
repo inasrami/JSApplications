@@ -1,4 +1,4 @@
-import { html } from '/node_modules/lit-html/lit-html.js';
+import { html } from '../lib.js';
 import { createCar } from '../api/data.js';
 
 const createTemplate = (onSubmit) => html`
@@ -6,7 +6,7 @@ const createTemplate = (onSubmit) => html`
         <div class="form form-auto">
             <h2>Share Your Car</h2>
             <form class="create-form" @submit=${onSubmit}>
-                <input type="text" name="model" id="model" placeholder="Model"/>
+                <input type="text" name="model" id="model" placeholder="Model" />
                 <input type="text" name="imageUrl" id="car-image" placeholder="Your Car Image URL" />
                 <input type="text" name="price" id="price" placeholder="Price in Euro" />
                 <input type="number" name="weight" id="weight" placeholder="Weight in Kg" />
@@ -15,9 +15,10 @@ const createTemplate = (onSubmit) => html`
                 <button type="submit">Add</button>
             </form>
         </div>
-    </section>`;
+    </section>
+`;
 
-export function createPage(ctx) {
+export function showCreate(ctx) {
     ctx.render(createTemplate(onSubmit));
 
     async function onSubmit(event) {

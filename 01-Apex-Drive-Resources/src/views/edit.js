@@ -1,4 +1,4 @@
-import { html } from '/node_modules/lit-html/lit-html.js';
+import { html } from '../lib.js';
 import { getCarById, editCar } from '../api/data.js';
 
 const editTemplate = (car, onSubmit) => html`
@@ -15,11 +15,12 @@ const editTemplate = (car, onSubmit) => html`
                 <button type="submit">Edit</button>
             </form>
         </div>
-    </section>`;
+    </section>
+`;
 
-export async function editPage(ctx) {
-    const carId = ctx.params.id;
-    const car = await getCarById(carId);
+export async function showEdit(ctx) {
+    const id = ctx.params.id;
+    const car = await getCarById(id);
 
     ctx.render(editTemplate(car, onSubmit));
 
@@ -27,7 +28,7 @@ export async function editPage(ctx) {
         event.preventDefault();
         const formData = new FormData(event.target);
         
-        const editedCar = {
+        const carData = {
             model: formData.get('model').trim(),
             imageUrl: formData.get('imageUrl').trim(),
             price: formData.get('price').trim(),
@@ -36,11 +37,11 @@ export async function editPage(ctx) {
             about: formData.get('about').trim()
         };
 
-        if (Object.values(editedCar).some(x => x == '')) {
+        if (Object.values(carData).some(x => x == '')) {
             return alert('All fields are required!');
         }
 
-        await editCar(carId, editedCar);
-        ctx.page.redirect('/details/' + carId);
+        await editCar(id, carData);
+        ctx.page.redirect('/details/' + id);
     }
 }

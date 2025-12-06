@@ -1,6 +1,5 @@
-import { html } from '/node_modules/lit-html/lit-html.js';
-import { register } from '../api/data.js';
-import { setUserData } from '../util.js';
+import { html } from '../lib.js';
+import { register } from '../api/users.js';
 
 const registerTemplate = (onSubmit) => html`
     <section id="register">
@@ -14,9 +13,10 @@ const registerTemplate = (onSubmit) => html`
                 <p class="message">Already registered? <a href="/login">Login</a></p>
             </form>
         </div>
-    </section>`;
+    </section>
+`;
 
-export function registerPage(ctx) {
+export function showRegister(ctx) {
     ctx.render(registerTemplate(onSubmit));
 
     async function onSubmit(event) {
@@ -29,17 +29,13 @@ export function registerPage(ctx) {
         if (email == '' || password == '' || repass == '') {
             return alert('All fields are required!');
         }
+
         if (password != repass) {
             return alert('Passwords do not match!');
         }
 
-        try {
-            const user = await register({ email, password });
-            setUserData(user);
-            ctx.updateNav();
-            ctx.page.redirect('/');
-        } catch (err) {
-
-        }
+        await register(email, password);
+        ctx.updateNav();
+        ctx.page.redirect('/');
     }
 }

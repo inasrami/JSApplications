@@ -1,61 +1,68 @@
-import { render } from '/node_modules/lit-html/lit-html.js';
-import page from '/node_modules/page/page.mjs';
+import { page, render, html } from './lib.js';
+import { getUserData } from './util.js';
+import { logout } from './api/users.js';
 
+import { showHome } from './views/home.js';
+import { showLogin } from './views/login.js';
+import { showRegister } from './views/register.js';
+import { showDashboard } from './views/dashboard.js';
+import { showCreate } from './views/create.js';
+import { showDetails } from './views/details.js';
+import { showEdit } from './views/edit.js';
+import { showSearch } from './views/search.js';
 
-import { getUserData, clearUserData } from './util.js';
-import { logout } from './api/data.js';
-import { homePage } from './views/home.js';
-import { loginPage } from './views/login.js';
-import { registerPage } from './views/register.js';
-import { dashboardPage } from './views/dashboard.js';
-import { createPage } from './views/create.js';
-import { detailsPage } from './views/details.js';
-import { editPage } from './views/edit.js';
-import { searchPage } from './views/search.js';
+const main = document.getElementById('main-element');
+const nav = document.querySelector('nav');
 
+page(decorateContext);
+page('/', showHome);
+page('/index.html', showHome);
+page('/login', showLogin);
+page('/register', showRegister);
+page('/dashboard', showDashboard);
+page('/create', showCreate);
+page('/details/:id', showDetails);
+page('/edit/:id', showEdit);
+page('/search', showSearch);
+page('/logout', onLogout);
 
-const root = document.getElementById('main-element');
-
-function updateNav() {
-    const user = getUserData();
-    if (user) {
-        document.querySelector('.user').style.display = 'inline-block';
-        document.querySelector('.guest').style.display = 'none';
-    } else {
-        document.querySelector('.user').style.display = 'none';
-        document.querySelector('.guest').style.display = 'inline-block';
-    }
-}
+updateNav();
+page.start();
 
 function decorateContext(ctx, next) {
-    ctx.render = (content) => render(content, root);
+    ctx.render = (content) => render(content, main);
     ctx.updateNav = updateNav;
     ctx.user = getUserData();
     next();
 }
 
-page(decorateContext);
-page('/', homePage);
-page('/index.html', homePage);
-page('/login', loginPage);
-page('/register', registerPage);
-page('/dashboard', dashboardPage);
-page('/create', createPage);
-page('/details/:id', detailsPage);
-page('/edit/:id', editPage);
-page('/search', searchPage);
+function updateNav() {
+    const user = getUserData();
+    render(navTemplate(user), nav);
+}
 
-page.start();
-updateNav();
+const navTemplate = (user) => html`
+    <div>
+        <a href="/dashboard">Our Cars</a>
+        <a href="/search">Search</a>
+    </div>
 
+    ${user 
+        ? html`
+            <div class="user">
+                <a href="/create">Add Your Car</a>
+                <a href="/logout">Logout</a>
+            </div>`
+        : html`
+            <div class="guest">
+                <a href="/login">Login</a>
+                <a href="/register">Register</a>
+            </div>`
+    }
+`;
 
-const logoutBtn = document.getElementById('logoutBtn');
-if (logoutBtn) {
-    logoutBtn.addEventListener('click', async (e) => {
-        e.preventDefault();
-        await logout();
-        clearUserData();
-        updateNav();
-        page.redirect('/');
-    });
+async function onLogout() {
+    await logout();
+    updateNav();
+    page.redirect('/');
 }

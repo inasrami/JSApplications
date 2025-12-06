@@ -1,29 +1,34 @@
-import * as api from './api.js';
+import { get, post, put, del } from './api.js';
 
-export const login = api.post.bind(null, '/users/login');
-export const register = api.post.bind(null, '/users/register');
-export const logout = api.get.bind(null, '/users/logout');
+const endpoints = {
+    getAll: '/data/cars?sortBy=_createdOn%20desc',
+    create: '/data/cars',
+    details: (id) => `/data/cars/${id}`,
+    delete: (id) => `/data/cars/${id}`,
+    edit: (id) => `/data/cars/${id}`,
+    search: (query) => `/data/cars?where=model%20LIKE%20%22${query}%22`
+};
 
 export async function getAllCars() {
-    return api.get('/data/cars?sortBy=_createdOn%20desc');
+    return get(endpoints.getAll);
 }
 
 export async function getCarById(id) {
-    return api.get('/data/cars/' + id);
+    return get(endpoints.details(id));
 }
 
-export async function createCar(car) {
-    return api.post('/data/cars', car);
+export async function createCar(data) {
+    return post(endpoints.create, data);
 }
 
-export async function editCar(id, car) {
-    return api.put('/data/cars/' + id, car);
+export async function editCar(id, data) {
+    return put(endpoints.edit(id), data);
 }
 
 export async function deleteCar(id) {
-    return api.del('/data/cars/' + id);
+    return del(endpoints.delete(id));
 }
 
 export async function searchCars(query) {
-    return api.get(`/data/cars?where=model%20LIKE%20%22${query}%22`);
+    return get(endpoints.search(query));
 }
