@@ -1,4 +1,4 @@
-const { chromium } = require('playwright'); 
+const { chromium } = require('playwright-chromium');
 const { expect } = require('chai');
 
 // const userApplicationHttpPort = "#userApplicationHttpPort#";

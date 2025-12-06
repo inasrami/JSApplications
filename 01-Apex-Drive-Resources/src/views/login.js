@@ -1,37 +1,42 @@
-import { html } from '../lib.js';
-import { login } from '../api/users.js';
+import { html } from '../../node_modules/lit-html/lit-html.js';
+import { post } from '../api.js';
+import { setUserData } from '../util.js';
 
 const loginTemplate = (onSubmit) => html`
-    <section id="login">
-        <div class="form">
-            <h2>Login</h2>
-            <form class="login-form" @submit=${onSubmit}>
-                <input type="text" name="email" id="email" placeholder="email" />
-                <input type="password" name="password" id="password" placeholder="password" />
-                <button type="submit">login</button>
-                <p class="message">
-                    Not registered? <a href="/register">Create an account</a>
-                </p>
-            </form>
-        </div>
-    </section>
-`;
+<section id="login">
+    <div class="form">
+        <h2>Login</h2>
+        <form class="login-form" @submit=${onSubmit}>
+            <input type="text" name="email" id="email" placeholder="email" />
+            <input type="password" name="password" id="password" placeholder="password" />
+            <button type="submit">login</button>
+            <p class="message">
+                Not registered? <a href="/register">Create an account</a>
+            </p>
+        </form>
+    </div>
+</section>`;
 
-export function showLogin(ctx) {
+export function loginPage(ctx) {
     ctx.render(loginTemplate(onSubmit));
 
-    async function onSubmit(event) {
-        event.preventDefault();
-        const formData = new FormData(event.target);
+    async function onSubmit(e) {
+        e.preventDefault();
+        const formData = new FormData(e.target);
         const email = formData.get('email').trim();
         const password = formData.get('password').trim();
 
-        if (email == '' || password == '') {
+        if (!email || !password) {
             return alert('All fields are required!');
         }
 
-        await login(email, password);
-        ctx.updateNav();
-        ctx.page.redirect('/');
+        try {
+            const userData = await post('/users/login', { email, password });
+            setUserData(userData);
+            ctx.updateNav();
+            ctx.page.redirect('/');
+        } catch (err) {
+            console.error(err);
+        }
     }
 }
